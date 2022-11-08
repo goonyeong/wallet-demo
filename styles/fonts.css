@@ -1,0 +1,60 @@
+@font-face {
+  font-family: "Font_test";
+  src: url("/fonts/Font-Light.woff") format("truetype");
+  font-weight: 300;
+}
+@font-face {
+  font-family: "Font_test";
+  src: url("/fonts/Font-Regular.woff") format("truetype");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Font_test";
+  src: url("/fonts/Font-Bold.woff") format("truetype");
+  font-weight: 700;
+}
+@font-face {
+  font-family: "NotoSansKR";
+  src: url("/fonts/NotoSansKR_Thin.woff") format("truetype");
+  font-weight: 100;
+}
+@font-face {
+  font-family: "NotoSansKR";
+  src: url("/fonts/NotoSansKR_Light.woff") format("truetype");
+  font-weight: 300;
+}
+@font-face {
+  font-family: "NotoSansKR";
+  src: url("/fonts/NotoSansKR_Regular.woff") format("truetype");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "NotoSansKR";
+  src: url("/fonts/NotoSansKR_Medium.woff") format("truetype");
+  font-weight: 500;
+}
+@font-face {
+  font-family: "NotoSansKR";
+  src: url("/fonts/NotoSansKR_Bold.woff") format("truetype");
+  font-weight: 700;
+}
+@font-face {
+  font-family: "NotoSansKR";
+  src: url("/fonts/NotoSansKR_Black.woff") format("truetype");
+  font-weight: 900;
+}
+@font-face {
+  font-family: "NanumMyeongjo";
+  src: url("/fonts/NanumMyeongjo_Regular.woff") format("truetype");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "NanumMyeongjo";
+  src: url("/fonts/NanumMyeongjo_Bold.woff") format("truetype");
+  font-weight: 700;
+}
+@font-face {
+  font-family: "NanumMyeongjo";
+  src: url("/fonts/NanumMyeongjo_ExtraBold.woff") format("truetype");
+  font-weight: 800;
+}
