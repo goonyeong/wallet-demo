@@ -1,3 +1,5 @@
+type TWALLET = "METAMASK" | "KAIKAS" | "PHANTOM" | "";
+
 // Data
 interface ISong {
   title: string;
@@ -15,7 +17,6 @@ interface IMovieDetail {
 }
 
 // Props
-
 interface RenderFallbackProps<ErrorType extends Error = Error> {
   error: ErrorType;
   reset: (...args: unknown[]) => void;

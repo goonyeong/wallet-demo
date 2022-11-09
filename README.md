@@ -1,6 +1,10 @@
-# Phantom wallet demo
+# wallet demo
 
 connect wallet extension
+
+- Metamask
+- Kaikas
+- Phantom
 
 ### 1) Install modules
 

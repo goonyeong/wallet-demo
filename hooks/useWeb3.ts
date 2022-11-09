@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { IPhantomProvider } from "types/interface";
-import { PublicKey } from "@solana/web3.js";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 
-export const useWeb3 = (setAddress: (address: string) => void) => {
+const WALLET = "METAMASK";
+
+export const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET) => void) => {
   const [web3Provider, setWeb3Provider] = useState<MetaMaskInpageProvider | undefined>(undefined);
   const [isWalletInstall, setIsWalletInstall] = useState(false);
 
@@ -13,7 +13,7 @@ export const useWeb3 = (setAddress: (address: string) => void) => {
       const accountArr = await web3Provider.request({
         method: "eth_requestAccounts",
       });
-      if (Array.isArray(accountArr) && accountArr.length > 0) setAddress(accountArr[0]);
+      if (Array.isArray(accountArr) && accountArr.length > 0) setWalletInfo(accountArr[0], WALLET);
     }
   };
 
@@ -32,7 +32,11 @@ export const useWeb3 = (setAddress: (address: string) => void) => {
     const onAccountChange = () => {
       web3Provider?.on("accountsChanged", (accountArr) => {
         if (Array.isArray(accountArr)) {
-          setAddress(accountArr[0]);
+          if (accountArr[0]) {
+            setWalletInfo(accountArr[0], WALLET);
+          } else {
+            setWalletInfo(accountArr[0], "");
+          }
         }
       });
     };
@@ -41,7 +45,7 @@ export const useWeb3 = (setAddress: (address: string) => void) => {
     const removeAccountChange = () => {
       web3Provider?.removeListener("accountsChanged", (accountArr) => {
         if (Array.isArray(accountArr)) {
-          setAddress(accountArr[0]);
+          setWalletInfo(accountArr[0], WALLET);
         }
       });
     };
@@ -53,7 +57,7 @@ export const useWeb3 = (setAddress: (address: string) => void) => {
     return () => {
       removeAccountChange();
     };
-  }, [web3Provider]);
+  }, [web3Provider, setWalletInfo]);
 
   // Initialize solana provider state
   useEffect(() => {

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { IPhantomProvider } from "types/interface";
-import { PublicKey } from "@solana/web3.js";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 
-export const useKlaytn = (setAddress: (address: string) => void) => {
+const WALLET = "KAIKAS";
+
+export const useKlaytn = (setWalletInfo: (address: string, wallet: TWALLET) => void) => {
   const [klaytnProvider, setKlaytnProvider] = useState<any | undefined>(undefined);
   const [isWalletInstall, setIsWalletInstall] = useState(false);
 
@@ -11,7 +11,7 @@ export const useKlaytn = (setAddress: (address: string) => void) => {
   const connectWallet = async () => {
     if (klaytnProvider) {
       const accountArr = await klaytnProvider.enable();
-      if (Array.isArray(accountArr) && accountArr.length > 0) setAddress(accountArr[0]);
+      if (Array.isArray(accountArr) && accountArr.length > 0) setWalletInfo(accountArr[0], WALLET);
     }
   };
 
@@ -30,7 +30,7 @@ export const useKlaytn = (setAddress: (address: string) => void) => {
     const onAccountChange = () => {
       klaytnProvider?.on("accountsChanged", (accountArr: Array<any> | unknown) => {
         if (Array.isArray(accountArr)) {
-          setAddress(accountArr[0]);
+          setWalletInfo(accountArr[0], WALLET);
         }
       });
     };
@@ -38,7 +38,7 @@ export const useKlaytn = (setAddress: (address: string) => void) => {
     if (klaytnProvider) {
       onAccountChange();
     }
-  }, [klaytnProvider]);
+  }, [klaytnProvider, setWalletInfo]);
 
   // Initialize Klaytn provider state
   useEffect(() => {

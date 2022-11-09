@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { IPhantomProvider } from "types/interface";
+import { IPhantomProvider } from "types/interfaceWallet";
 import { PublicKey } from "@solana/web3.js";
 
-export const useSolana = (setAddress: (address: string) => void) => {
+const WALLET = "PHANTOM";
+
+export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => void) => {
   const [solanaProvider, setSolanaProvider] = useState<IPhantomProvider | undefined>(undefined);
   const [isWalletInstall, setIsWalletInstall] = useState(false);
 
@@ -10,7 +12,7 @@ export const useSolana = (setAddress: (address: string) => void) => {
   const connectWallet = async () => {
     if (solanaProvider) {
       const { publicKey } = await solanaProvider.connect();
-      setAddress(publicKey.toString());
+      setWalletInfo(publicKey.toString(), WALLET);
     }
   };
 
@@ -29,20 +31,20 @@ export const useSolana = (setAddress: (address: string) => void) => {
     const onAccountChange = () => {
       solanaProvider?.on("accountChanged", (publicKey: PublicKey) => {
         console.log("account changed:: ", publicKey.toString());
-        setAddress(publicKey.toString());
+        setWalletInfo(publicKey.toString(), WALLET);
       });
     };
     // Connect
     const onConnect = () => {
       solanaProvider?.on("connect", (publicKey: PublicKey) => {
-        setAddress(publicKey.toString());
+        setWalletInfo(publicKey.toString(), WALLET);
       });
     };
     // Disconnect
     const onDisconnect = () => {
       solanaProvider?.on("disconnect", () => {
         console.log("phantom disconnected");
-        setAddress("");
+        setWalletInfo("", "");
       });
     };
 
@@ -51,7 +53,7 @@ export const useSolana = (setAddress: (address: string) => void) => {
       onConnect();
       onDisconnect();
     }
-  }, [solanaProvider]);
+  }, [solanaProvider, setWalletInfo]);
 
   // Initialize solana provider state
   useEffect(() => {
