@@ -1,52 +1,36 @@
 // React & Next
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 // Style
 import styled from "styled-components";
-// Utils
-import { useRouter } from "next/router";
 // Types
-import { IPhantomProvider } from "types/interface";
-import { useSolana } from "wallet/wallet";
+import { useSolana } from "hooks/useSolana";
 
 const Home: NextPage = () => {
-  const [walletKey, setWalletKey] = useState<string>("");
+  const [walletAddress, setWalletAddress] = useState<string>("");
 
-  const { connectWallet, disconnectWallet, isPhantom, getAddress } = useSolana();
-
-  console.log("is p", isPhantom);
+  const { connectWallet, disconnectWallet, isConnected, getAddress } = useSolana(setWalletAddress);
 
   return (
     <Wrapper>
-      {isPhantom ? (
+      {isConnected ? (
         <h2 className="walletAddress">
-          Address: <span>{walletKey}</span>
+          Address: <span>{walletAddress}</span>
         </h2>
       ) : (
         <h2 className="walletAddress">Phantom is not installed</h2>
       )}
-      {walletKey ? (
+      {walletAddress ? (
         <button
           className="btn"
           onClick={() => {
-            disconnectWallet(walletKey);
-            setWalletKey("");
+            disconnectWallet(walletAddress);
           }}
         >
           Disconnect
         </button>
       ) : (
-        <button
-          className="btn"
-          onClick={async () => {
-            const result = await connectWallet();
-            if (result) {
-              setWalletKey(result);
-            } else {
-              console.log("dd", result);
-            }
-          }}
-        >
+        <button className="btn" onClick={connectWallet}>
           Connect
         </button>
       )}
