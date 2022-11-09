@@ -1,47 +1,46 @@
 // React & Next
 import { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // Style
 import styled from "styled-components";
-// Types
+// Hooks
 import { useSolana } from "hooks/useSolana";
+import { useWeb3 } from "hooks/useWeb3";
+import { useKlaytn } from "hooks/useKlaytn";
 
 const Home: NextPage = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
 
-  const { connectWallet, disconnectWallet, isConnected, getAddress } = useSolana(setWalletAddress);
+  // const { connectWallet, disconnectWallet, isWalletInstall, getAddress } =
+  //   useSolana(setWalletAddress);
+  // const { isWalletInstall, connectWallet, getAddress } = useWeb3(setWalletAddress);
+  const { isWalletInstall, connectWallet, getAddress } = useKlaytn(setWalletAddress);
 
   return (
     <Wrapper>
-      {isConnected ? (
-        <h2 className="walletAddress">
-          Address: <span>{walletAddress}</span>
-        </h2>
+      {isWalletInstall ? (
+        <>
+          {walletAddress ? (
+            <h2 className="walletAddress">
+              Address: <span>{walletAddress}</span>
+            </h2>
+          ) : (
+            <button className="btn" onClick={connectWallet}>
+              Connect
+            </button>
+          )}
+          <button
+            className="btn"
+            onClick={() => {
+              alert(getAddress());
+            }}
+          >
+            Get Address
+          </button>
+        </>
       ) : (
         <h2 className="walletAddress">Phantom is not installed</h2>
       )}
-      {walletAddress ? (
-        <button
-          className="btn"
-          onClick={() => {
-            disconnectWallet(walletAddress);
-          }}
-        >
-          Disconnect
-        </button>
-      ) : (
-        <button className="btn" onClick={connectWallet}>
-          Connect
-        </button>
-      )}
-      <button
-        className="btn"
-        onClick={() => {
-          alert(getAddress());
-        }}
-      >
-        Get Address
-      </button>
     </Wrapper>
   );
 };

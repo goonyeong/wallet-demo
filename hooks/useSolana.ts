@@ -4,21 +4,13 @@ import { PublicKey } from "@solana/web3.js";
 
 export const useSolana = (setAddress: (address: string) => void) => {
   const [solanaProvider, setSolanaProvider] = useState<IPhantomProvider | undefined>(undefined);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isWalletInstall, setIsWalletInstall] = useState(false);
 
   // Connect wallet
   const connectWallet = async () => {
     if (solanaProvider) {
       const { publicKey } = await solanaProvider.connect();
       setAddress(publicKey.toString());
-    }
-  };
-
-  // Disconnect wallet
-  const disconnectWallet = async (walletAddress: string) => {
-    if (solanaProvider && walletAddress) {
-      await solanaProvider.disconnect();
-      setAddress("");
     }
   };
 
@@ -48,7 +40,8 @@ export const useSolana = (setAddress: (address: string) => void) => {
     };
     // Disconnect
     const onDisconnect = () => {
-      solanaProvider?.on("disconnect", (publicKey: PublicKey) => {
+      solanaProvider?.on("disconnect", () => {
+        console.log("phantom disconnected");
         setAddress("");
       });
     };
@@ -67,7 +60,7 @@ export const useSolana = (setAddress: (address: string) => void) => {
         // @ts-ignore
         const provider = window.solana as any;
         if (provider.isPhantom) {
-          setIsConnected(true);
+          setIsWalletInstall(true);
           return provider as IPhantomProvider;
         }
       }
@@ -77,9 +70,8 @@ export const useSolana = (setAddress: (address: string) => void) => {
   }, []);
 
   return {
-    isConnected,
+    isWalletInstall,
     connectWallet,
-    disconnectWallet,
     getAddress,
   };
 };
