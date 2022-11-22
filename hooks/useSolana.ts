@@ -12,6 +12,7 @@ export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => v
   const connectWallet = async () => {
     if (solanaProvider) {
       const { publicKey } = await solanaProvider.connect();
+      console.log("connect!!");
       setWalletInfo(publicKey.toString(), WALLET);
     }
   };
@@ -25,35 +26,18 @@ export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => v
     return "";
   };
 
-  // connect, unconnect, change -> wallet address update
-  useEffect(() => {
-    // AccountChange
-    const onAccountChange = () => {
-      solanaProvider?.on("accountChanged", (publicKey: PublicKey) => {
-        console.log("account changed:: ", publicKey.toString());
-        setWalletInfo(publicKey.toString(), WALLET);
-      });
-    };
-    // Connect
-    const onConnect = () => {
-      solanaProvider?.on("connect", (publicKey: PublicKey) => {
-        setWalletInfo(publicKey.toString(), WALLET);
-      });
-    };
-    // Disconnect
-    const onDisconnect = () => {
-      solanaProvider?.on("disconnect", () => {
-        console.log("phantom disconnected");
-        setWalletInfo("", "");
-      });
-    };
+  // AccountChange
+  const onAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
+    solanaProvider?.on("accountChanged", (publicKey: PublicKey) => {
+      console.log("account change detected", publicKey);
+      onChange(publicKey.toString(), WALLET);
+    });
+  };
 
-    if (solanaProvider) {
-      onAccountChange();
-      onConnect();
-      onDisconnect();
-    }
-  }, [solanaProvider, setWalletInfo]);
+  // Disconnect
+  const onDisconnect = (disconnect: () => void) => {
+    solanaProvider?.on("disconnect", disconnect);
+  };
 
   // Initialize solana provider state
   useEffect(() => {
@@ -72,8 +56,11 @@ export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => v
   }, []);
 
   return {
+    solanaProvider,
     isWalletInstall,
     connectWallet,
     getAddress,
+    onAccountChange,
+    onDisconnect,
   };
 };

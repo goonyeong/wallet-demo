@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { MetaMaskInpageProvider } from "@metamask/providers";
 
 const WALLET = "KAIKAS";
 
@@ -24,25 +23,23 @@ export const useKlaytn = (setWalletInfo: (address: string, wallet: TWALLET) => v
     return "";
   };
 
-  // connect, unconnect, change -> wallet address update
-  useEffect(() => {
-    // AccountChange
-    const onAccountChange = () => {
-      klaytnProvider?.on("accountsChanged", (accountArr: Array<any> | unknown) => {
-        if (Array.isArray(accountArr)) {
-          setWalletInfo(accountArr[0], WALLET);
-        }
-      });
-    };
+  // AccountChange
+  const onAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
+    klaytnProvider?.on("accountsChanged", (accountArr: Array<any> | unknown) => {
+      if (Array.isArray(accountArr)) {
+        onChange(accountArr[0], WALLET);
+      }
+    });
+  };
 
-    if (klaytnProvider) {
-      onAccountChange();
-    }
-  }, [klaytnProvider, setWalletInfo]);
+  // Disconnect
+  const onDisconnect = (disconnect: () => void) => {
+    klaytnProvider?.on("disconnected", disconnect);
+  };
 
   // Initialize Klaytn provider state
   useEffect(() => {
-    const getProvider = (): MetaMaskInpageProvider | undefined => {
+    const getProvider = () => {
       const provider = window.klaytn;
       if (provider?.isKaikas) {
         setIsWalletInstall(true);
@@ -54,8 +51,11 @@ export const useKlaytn = (setWalletInfo: (address: string, wallet: TWALLET) => v
   }, []);
 
   return {
+    klaytnProvider,
     isWalletInstall,
     connectWallet,
     getAddress,
+    onAccountChange,
+    onDisconnect,
   };
 };

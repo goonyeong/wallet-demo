@@ -26,38 +26,23 @@ export const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET) => voi
     return "";
   };
 
-  // connect, unconnect, change -> wallet address update
-  useEffect(() => {
-    // AccountChange
-    const onAccountChange = () => {
-      web3Provider?.on("accountsChanged", (accountArr) => {
-        if (Array.isArray(accountArr)) {
-          if (accountArr[0]) {
-            setWalletInfo(accountArr[0], WALLET);
-          } else {
-            setWalletInfo(accountArr[0], "");
-          }
-        }
-      });
-    };
+  // AccountChange
+  const onAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
+    web3Provider?.on("accountsChanged", (accountArr) => {
+      if (Array.isArray(accountArr)) {
+        onChange(accountArr[0], WALLET);
+      }
+    });
+  };
 
-    //Remove AccountChange
-    const removeAccountChange = () => {
-      web3Provider?.removeListener("accountsChanged", (accountArr) => {
-        if (Array.isArray(accountArr)) {
-          setWalletInfo(accountArr[0], WALLET);
-        }
-      });
-    };
-
-    if (web3Provider) {
-      onAccountChange();
-    }
-
-    return () => {
-      removeAccountChange();
-    };
-  }, [web3Provider, setWalletInfo]);
+  // Remove AccountChange
+  const removeAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
+    web3Provider?.removeListener("accountsChanged", (accountArr) => {
+      if (Array.isArray(accountArr)) {
+        onChange(accountArr[0], WALLET);
+      }
+    });
+  };
 
   // Initialize solana provider state
   useEffect(() => {
@@ -73,8 +58,11 @@ export const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET) => voi
   }, []);
 
   return {
+    web3Provider,
     isWalletInstall,
     connectWallet,
     getAddress,
+    onAccountChange,
+    removeAccountChange,
   };
 };
