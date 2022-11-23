@@ -7,6 +7,7 @@ import styled from "styled-components";
 import { useSolana } from "hooks/useSolana";
 import { useWeb3 } from "hooks/useWeb3";
 import { useKlaytn } from "hooks/useKlaytn";
+import { getNetworkName } from "utils/common";
 
 const Home: NextPage = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
@@ -14,10 +15,11 @@ const Home: NextPage = () => {
   const [currentNetwork, setCurrentNetwork] = useState<TNETWORK>("");
   const currentWalletRef = useRef(currentWallet);
 
-  const setWalletInfo = (address: string, wallet: TWALLET) => {
-    console.log("set wallet info", address, wallet);
+  const setWalletInfo = (address: string, wallet: TWALLET, network: TNETWORK) => {
+    console.log("set wallet info:", address, wallet, network);
     setWalletAddress(address);
     setCurrentWallet(wallet);
+    setCurrentNetwork(network);
     currentWalletRef.current = wallet;
   };
 
@@ -27,7 +29,7 @@ const Home: NextPage = () => {
     connectWallet: connectMetamask,
     getAddress: getMetamaskAddress,
     onAccountChange: onMetamaskAccountChange,
-    removeAccountChange: removeMetamaskAccountChange,
+    onNetworkChange: onMetamaskNetworkChange,
   } = useWeb3(setWalletInfo);
   const {
     klaytnProvider,
@@ -35,6 +37,7 @@ const Home: NextPage = () => {
     connectWallet: connectKaikas,
     getAddress: getKaikasAddress,
     onAccountChange: onKaikasAccountChange,
+    onNetworkChange: onKaikasNetworkChange,
     onDisconnect: onKaikasDisconnect,
   } = useKlaytn(setWalletInfo);
   const {
@@ -43,7 +46,6 @@ const Home: NextPage = () => {
     connectWallet: connectPhantom,
     getAddress: getPhantomAddress,
     onAccountChange: onPhantomAccountChange,
-    onDisconnect: onPhantomDisconnect,
   } = useSolana(setWalletInfo);
 
   const handleGetAddressClick = () => {
@@ -58,47 +60,48 @@ const Home: NextPage = () => {
     }
   };
 
-  const handleAccountChange = (address: string, wallet: TWALLET) => {
+  const handleAccountChange = (address: string, wallet: TWALLET, network: TNETWORK) => {
     if (currentWalletRef.current === wallet) {
-      console.log("handle account change", wallet, address);
-      if (currentWalletRef.current === "PHANTOM") {
-        connectPhantom();
-      } else {
-        setWalletInfo(address, wallet);
-      }
+      console.log("handle account change:", wallet, address, network);
+      setWalletInfo(address, wallet, network);
+    }
+  };
+
+  const handleNetworkChange = (network: TNETWORK, wallet: TWALLET) => {
+    if (currentWalletRef.current === wallet) {
+      setCurrentNetwork(network);
     }
   };
 
   const handleDisconnect = () => {
     console.log("handle disConnect");
-    setWalletInfo("", "");
+    setWalletInfo("", "", "");
   };
 
   useEffect(() => {
     if (web3Provider) {
       onMetamaskAccountChange(handleAccountChange);
+      onMetamaskNetworkChange(handleNetworkChange);
     }
 
     if (klaytnProvider) {
       onKaikasAccountChange(handleAccountChange);
+      onKaikasNetworkChange(handleNetworkChange);
       onKaikasDisconnect(handleDisconnect);
     }
 
     if (solanaProvider) {
       onPhantomAccountChange(handleAccountChange);
-      // detect disconnect is not working
-      onPhantomDisconnect(handleDisconnect);
     }
-
-    return () => {
-      removeMetamaskAccountChange(handleAccountChange);
-    };
   }, [web3Provider, klaytnProvider, solanaProvider]);
 
   return (
     <Wrapper>
       <h2 className="walletAddress">
         Wallet: <span>{currentWallet}</span>
+      </h2>
+      <h2 className="walletAddress">
+        Network: <span>{currentNetwork ? currentNetwork : "UNKNOWN"}</span>
       </h2>
       <h2 className="walletAddress">
         Address: <span>{walletAddress}</span>
@@ -131,6 +134,9 @@ const Wrapper = styled.section`
   gap: 30px;
   .walletAddress {
     font-size: 30px;
+    span {
+      color: #28a964;
+    }
   }
   .btn {
     color: ${({ theme }) => theme.colors.primary_color};

@@ -40,3 +40,9 @@ interface IErrorBoundaryState {
   error: Error | null;
   resetKeys: unknown[];
 }
+
+interface ISetWalletInfoParam {
+  address: string;
+  wallet: TWALLET;
+  network: TNETWORK;
+}

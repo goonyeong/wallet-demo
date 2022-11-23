@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { getNetworkName } from "utils/common";
 
 const WALLET = "KAIKAS";
 
-export const useKlaytn = (setWalletInfo: (address: string, wallet: TWALLET) => void) => {
+export const useKlaytn = (
+  setWalletInfo: (address: string, wallet: TWALLET, network: TNETWORK) => void
+) => {
   const [klaytnProvider, setKlaytnProvider] = useState<any | undefined>(undefined);
   const [isWalletInstall, setIsWalletInstall] = useState(false);
 
@@ -10,7 +13,8 @@ export const useKlaytn = (setWalletInfo: (address: string, wallet: TWALLET) => v
   const connectWallet = async () => {
     if (klaytnProvider) {
       const accountArr = await klaytnProvider.enable();
-      if (Array.isArray(accountArr) && accountArr.length > 0) setWalletInfo(accountArr[0], WALLET);
+      if (Array.isArray(accountArr) && accountArr.length > 0)
+        setWalletInfo(accountArr[0], WALLET, getNetwork());
     }
   };
 
@@ -23,18 +27,40 @@ export const useKlaytn = (setWalletInfo: (address: string, wallet: TWALLET) => v
     return "";
   };
 
-  // AccountChange
-  const onAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
-    klaytnProvider?.on("accountsChanged", (accountArr: Array<any> | unknown) => {
-      if (Array.isArray(accountArr)) {
-        onChange(accountArr[0], WALLET);
-      }
-    });
+  // Get network
+  const getNetwork = (): TNETWORK => {
+    if (klaytnProvider?.networkVersion) {
+      const chain_id = klaytnProvider.networkVersion.toString();
+
+      return getNetworkName(chain_id);
+    }
+
+    return "";
   };
 
   // Disconnect
   const onDisconnect = (disconnect: () => void) => {
     klaytnProvider?.on("disconnected", disconnect);
+  };
+
+  // AccountChange
+  const onAccountChange = (
+    onChange: (address: string, wallet: TWALLET, network: TNETWORK) => void
+  ) => {
+    klaytnProvider?.on("accountsChanged", (accountArr: Array<any> | unknown) => {
+      if (Array.isArray(accountArr)) {
+        onChange(accountArr[0], WALLET, getNetwork());
+      }
+    });
+  };
+
+  // NetworkChange
+  const onNetworkChange = (onChange: (network: TNETWORK, wallet: TWALLET) => void) => {
+    klaytnProvider?.on("networkChanged", (id: number) => {
+      console.log(id);
+      const network = getNetworkName(id.toString());
+      onChange(network, WALLET);
+    });
   };
 
   // Initialize Klaytn provider state
@@ -56,6 +82,7 @@ export const useKlaytn = (setWalletInfo: (address: string, wallet: TWALLET) => v
     connectWallet,
     getAddress,
     onAccountChange,
+    onNetworkChange,
     onDisconnect,
   };
 };

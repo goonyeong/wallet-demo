@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { MetaMaskInpageProvider } from "@metamask/providers";
+import { getNetworkName, hexToDecimal } from "utils/common";
 
 const WALLET = "METAMASK";
 
-export const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET) => void) => {
+export const useWeb3 = (
+  setWalletInfo: (address: string, wallet: TWALLET, network: TNETWORK) => void
+) => {
   const [web3Provider, setWeb3Provider] = useState<MetaMaskInpageProvider | undefined>(undefined);
   const [isWalletInstall, setIsWalletInstall] = useState(false);
 
@@ -13,7 +16,8 @@ export const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET) => voi
       const accountArr = await web3Provider.request({
         method: "eth_requestAccounts",
       });
-      if (Array.isArray(accountArr) && accountArr.length > 0) setWalletInfo(accountArr[0], WALLET);
+      if (Array.isArray(accountArr) && accountArr.length > 0)
+        setWalletInfo(accountArr[0], WALLET, getNetwork());
     }
   };
 
@@ -26,20 +30,33 @@ export const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET) => voi
     return "";
   };
 
+  // Get network
+  const getNetwork = (): TNETWORK => {
+    if (web3Provider?.networkVersion) {
+      const chain_id = web3Provider.networkVersion;
+
+      return getNetworkName(chain_id);
+    }
+    return "";
+  };
+
   // AccountChange
-  const onAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
+  const onAccountChange = (
+    onChange: (address: string, wallet: TWALLET, network: TNETWORK) => void
+  ) => {
     web3Provider?.on("accountsChanged", (accountArr) => {
       if (Array.isArray(accountArr)) {
-        onChange(accountArr[0], WALLET);
+        onChange(accountArr[0], WALLET, getNetwork());
       }
     });
   };
 
-  // Remove AccountChange
-  const removeAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
-    web3Provider?.removeListener("accountsChanged", (accountArr) => {
-      if (Array.isArray(accountArr)) {
-        onChange(accountArr[0], WALLET);
+  // NetworkChange
+  const onNetworkChange = (onChange: (network: TNETWORK, wallet: TWALLET) => void) => {
+    web3Provider?.on("chainChanged", (id) => {
+      if (typeof id === "string") {
+        const network = getNetworkName(hexToDecimal(id));
+        onChange(network, WALLET);
       }
     });
   };
@@ -62,7 +79,8 @@ export const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET) => voi
     isWalletInstall,
     connectWallet,
     getAddress,
+    getNetwork,
     onAccountChange,
-    removeAccountChange,
+    onNetworkChange,
   };
 };

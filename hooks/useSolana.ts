@@ -4,7 +4,9 @@ import { PublicKey } from "@solana/web3.js";
 
 const WALLET = "PHANTOM";
 
-export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => void) => {
+export const useSolana = (
+  setWalletInfo: (address: string, wallet: TWALLET, network: TNETWORK) => void
+) => {
   const [solanaProvider, setSolanaProvider] = useState<IPhantomProvider | undefined>(undefined);
   const [isWalletInstall, setIsWalletInstall] = useState(false);
 
@@ -12,8 +14,8 @@ export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => v
   const connectWallet = async () => {
     if (solanaProvider) {
       const { publicKey } = await solanaProvider.connect();
-      console.log("connect!!");
-      setWalletInfo(publicKey.toString(), WALLET);
+      console.log("connect!");
+      setWalletInfo(publicKey.toString(), WALLET, "SOLANA");
     }
   };
 
@@ -27,17 +29,22 @@ export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => v
   };
 
   // AccountChange
-  const onAccountChange = (onChange: (address: string, wallet: TWALLET) => void) => {
+  const onAccountChange = (
+    onChange: (address: string, wallet: TWALLET, network: TNETWORK) => void
+  ) => {
     solanaProvider?.on("accountChanged", (publicKey: PublicKey) => {
-      console.log("account change detected", publicKey);
-      onChange(publicKey.toString(), WALLET);
+      if (publicKey) {
+        onChange(publicKey.toString(), WALLET, "SOLANA");
+      } else {
+        connectWallet();
+      }
     });
   };
 
-  // Disconnect
-  const onDisconnect = (disconnect: () => void) => {
-    solanaProvider?.on("disconnect", disconnect);
-  };
+  // // Disconnect
+  // const onDisconnect = (disconnect: () => void) => {
+  //   solanaProvider?.on("disconnect", disconnect);
+  // };
 
   // Initialize solana provider state
   useEffect(() => {
@@ -61,6 +68,5 @@ export const useSolana = (setWalletInfo: (address: string, wallet: TWALLET) => v
     connectWallet,
     getAddress,
     onAccountChange,
-    onDisconnect,
   };
 };
