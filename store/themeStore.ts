@@ -8,7 +8,7 @@ import { observable, action, makeObservable } from "mobx";
 
 export class ThemeStore {
   // observable
-  theme: string = "light";
+  theme: string = "dark";
 
   // constructor
   constructor() {
