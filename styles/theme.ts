@@ -29,23 +29,31 @@ const darkColors = {
   nav_color: "rgba(10, 10, 10, 0.8)",
 };
 
+const device = {
+  mobile: `screen and (max-width: 767px)`,
+  tablet: `screen and (max-width: 1023px)`,
+};
+
 // export types for styled.d.ts
 export type TypeVariable = typeof variable;
 export type TypeMixin = typeof mixin;
 export type TypeLightColor = typeof lightColors;
 export type TypeDarkColor = typeof darkColors;
+export type TypeDeviceSize = typeof device;
 
 // create and export theme
 const lightTheme: DefaultTheme = {
   colors: lightColors,
   variable,
   mixin,
+  device,
 };
 
 const darkTheme: DefaultTheme = {
   colors: darkColors,
   variable,
   mixin,
+  device,
 };
 
 export { lightTheme, darkTheme };

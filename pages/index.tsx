@@ -8,12 +8,17 @@ import { useSolana } from "hooks/useSolana";
 import { useWeb3 } from "hooks/useWeb3";
 import { useKlaytn } from "hooks/useKlaytn";
 import { getNetworkName } from "utils/common";
+import { useMediaQuery } from "react-responsive";
+import { MAX_MOBILE_WIDTH } from "types/constants";
 
 const Home: NextPage = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [currentWallet, setCurrentWallet] = useState<TWALLET>("");
   const [currentNetwork, setCurrentNetwork] = useState<TNETWORK>("");
   const currentWalletRef = useRef(currentWallet);
+
+  const [isMobile, setIsMobile] = useState(false);
+  const isMobileQuery = useMediaQuery({ maxWidth: MAX_MOBILE_WIDTH });
 
   const setWalletInfo = (address: string, wallet: TWALLET, network: TNETWORK) => {
     console.log("set wallet info:", address, wallet, network);
@@ -79,6 +84,11 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
+    console.log(isMobileQuery);
+    setIsMobile(isMobileQuery);
+  }, [isMobileQuery]);
+
+  useEffect(() => {
     if (web3Provider) {
       onMetamaskAccountChange(handleAccountChange);
       onMetamaskNetworkChange(handleNetworkChange);
@@ -97,6 +107,7 @@ const Home: NextPage = () => {
 
   return (
     <Wrapper>
+      {isMobile ? <div>Mobile</div> : <div>Desktop</div>}
       <h2 className="walletAddress">
         Wallet: <span>{currentWallet}</span>
       </h2>
@@ -142,6 +153,13 @@ const Wrapper = styled.section`
     color: ${({ theme }) => theme.colors.primary_color};
     font-size: 30px;
     padding: 10px 20px;
+    cursor: pointer;
+    @media ${({ theme }) => theme.device.tablet} {
+      color: ${({ theme }) => theme.colors.secondary_color};
+    }
+    @media ${({ theme }) => theme.device.mobile} {
+      color: ${({ theme }) => theme.colors.nav_color};
+    }
   }
 `;
 

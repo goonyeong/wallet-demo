@@ -35,7 +35,13 @@ const GlobalStyle = createGlobalStyle`
         display: block;
         width: 100%;
         height: 100%;
-  }
+    }
+    
+    @media ${({ theme }) => theme.device.mobile}{
+        button{
+            border-radius: 20px;
+        }    
+    }
     
 `;
 
