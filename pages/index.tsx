@@ -4,12 +4,11 @@ import { useEffect, useRef, useState } from "react";
 // Style
 import styled from "styled-components";
 // Hooks
-import { useSolana } from "hooks/useSolana";
-import { useWeb3 } from "hooks/useWeb3";
-import { useKlaytn } from "hooks/useKlaytn";
-import { getNetworkName } from "utils/common";
-import { useMediaQuery } from "react-responsive";
-import { MAX_MOBILE_WIDTH } from "types/constants";
+import useSolana from "hooks/useSolana";
+import useWeb3 from "hooks/useWeb3";
+import useKlaytn from "hooks/useKlaytn";
+import useDevice from "hooks/useDevice";
+import useResponsive from "hooks/useResponsive";
 
 const Home: NextPage = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
@@ -17,8 +16,8 @@ const Home: NextPage = () => {
   const [currentNetwork, setCurrentNetwork] = useState<TNETWORK>("");
   const currentWalletRef = useRef(currentWallet);
 
-  const [isMobile, setIsMobile] = useState(false);
-  const isMobileQuery = useMediaQuery({ maxWidth: MAX_MOBILE_WIDTH });
+  const { isMobileDevice } = useDevice();
+  const { isMobileSize } = useResponsive();
 
   const setWalletInfo = (address: string, wallet: TWALLET, network: TNETWORK) => {
     console.log("set wallet info:", address, wallet, network);
@@ -84,11 +83,6 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
-    console.log(isMobileQuery);
-    setIsMobile(isMobileQuery);
-  }, [isMobileQuery]);
-
-  useEffect(() => {
     if (web3Provider) {
       onMetamaskAccountChange(handleAccountChange);
       onMetamaskNetworkChange(handleNetworkChange);
@@ -107,7 +101,8 @@ const Home: NextPage = () => {
 
   return (
     <Wrapper>
-      {isMobile ? <div>Mobile</div> : <div>Desktop</div>}
+      {isMobileDevice ? <TEXT>Real Mobile</TEXT> : <TEXT>Real Desktop</TEXT>}
+      {isMobileSize ? <TEXT>Mobile</TEXT> : <TEXT>Desktop</TEXT>}
       <h2 className="walletAddress">
         Wallet: <span>{currentWallet}</span>
       </h2>
@@ -121,10 +116,10 @@ const Home: NextPage = () => {
         Get Address
       </button>
       <Btn_Container>
-        <button className="btn" onClick={connectMetamask} disabled={!isMetamaskInstall}>
+        <button className="btn" onClick={connectMetamask}>
           {isMetamaskInstall ? "Metamask Connect" : "Metamask is not installed"}
         </button>
-        <button className="btn" onClick={connectKaikas} disabled={!isKaikasInstall}>
+        <button className="btn" onClick={connectKaikas}>
           {isKaikasInstall ? "Kaikas Connect" : "Kaikas is not installed"}
         </button>
         <button className="btn" onClick={connectPhantom} disabled={!isPhantomInstall}>
@@ -151,16 +146,23 @@ const Wrapper = styled.section`
   }
   .btn {
     color: ${({ theme }) => theme.colors.primary_color};
+    ${({ theme }) => theme.mixin.flexCenter};
     font-size: 30px;
-    padding: 10px 20px;
     cursor: pointer;
-    @media ${({ theme }) => theme.device.tablet} {
-      color: ${({ theme }) => theme.colors.secondary_color};
-    }
-    @media ${({ theme }) => theme.device.mobile} {
+  }
+  @media ${({ theme }) => theme.device.mobile} {
+    justify-content: start;
+    padding-top: 30px;
+    .btn {
       color: ${({ theme }) => theme.colors.nav_color};
+      font-size: 20px;
     }
   }
+`;
+
+const TEXT = styled.div`
+  font-size: 30px;
+  color: orange;
 `;
 
 const Btn_Container = styled.div`
@@ -169,4 +171,9 @@ const Btn_Container = styled.div`
   height: 50px;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
+  @media ${({ theme }) => theme.device.mobile} {
+    grid-template-columns: 1fr;
+    width: 100%;
+    padding: 0 10%;
+  }
 `;

@@ -4,7 +4,7 @@ import { PublicKey } from "@solana/web3.js";
 
 const WALLET = "PHANTOM";
 
-export const useSolana = (
+const useSolana = (
   setWalletInfo: (address: string, wallet: TWALLET, network: TNETWORK) => void
 ) => {
   const [solanaProvider, setSolanaProvider] = useState<IPhantomProvider | undefined>(undefined);
@@ -70,3 +70,5 @@ export const useSolana = (
     onAccountChange,
   };
 };
+
+export default useSolana;

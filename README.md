@@ -6,6 +6,10 @@ connect wallet extension
 - Kaikas
 - Phantom
 
+### Version
+
+node v18.12.1
+
 ### 1) Install modules
 
 > npm install

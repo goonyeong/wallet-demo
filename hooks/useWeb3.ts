@@ -1,17 +1,26 @@
+import useDevice from "hooks/useDevice";
 import { useState, useEffect } from "react";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import { getNetworkName, hexToDecimal } from "utils/common";
 
 const WALLET = "METAMASK";
+const DEEPLINK = "metamask://path/";
 
-export const useWeb3 = (
-  setWalletInfo: (address: string, wallet: TWALLET, network: TNETWORK) => void
-) => {
+const useWeb3 = (setWalletInfo: (address: string, wallet: TWALLET, network: TNETWORK) => void) => {
   const [web3Provider, setWeb3Provider] = useState<MetaMaskInpageProvider | undefined>(undefined);
   const [isWalletInstall, setIsWalletInstall] = useState(false);
 
+  const { isMobileDevice } = useDevice();
+
   // Connect wallet
   const connectWallet = async () => {
+    if (isMobileDevice) {
+      const exeDeepLink = () => {
+        const url = DEEPLINK;
+        location.href = url;
+      };
+      exeDeepLink();
+    }
     if (web3Provider) {
       const accountArr = await web3Provider.request({
         method: "eth_requestAccounts",
@@ -84,3 +93,5 @@ export const useWeb3 = (
     onNetworkChange,
   };
 };
+
+export default useWeb3;
