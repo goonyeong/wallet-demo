@@ -7,8 +7,10 @@ import styled from "styled-components";
 import useSolana from "hooks/useSolana";
 import useWeb3 from "hooks/useWeb3";
 import useKlaytn from "hooks/useKlaytn";
-import useDevice from "hooks/useDevice";
+import useMobile from "hooks/useMobile";
 import useResponsive from "hooks/useResponsive";
+
+const TO_ADDRESS = "0x364d05346E52934e01B8FB5d7E371E02b3ce70C6";
 
 const Home: NextPage = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
@@ -16,7 +18,7 @@ const Home: NextPage = () => {
   const [currentNetwork, setCurrentNetwork] = useState<TNETWORK>("");
   const currentWalletRef = useRef(currentWallet);
 
-  const { isMobileDevice } = useDevice();
+  const { isMobile, mobileBrowser, mobileOs } = useMobile();
   const { isMobileSize } = useResponsive();
 
   const setWalletInfo = (address: string, wallet: TWALLET, network: TNETWORK) => {
@@ -32,6 +34,7 @@ const Home: NextPage = () => {
     isWalletInstall: isMetamaskInstall,
     connectWallet: connectMetamask,
     getAddress: getMetamaskAddress,
+    sendToken: sendMetamaskTokon,
     onAccountChange: onMetamaskAccountChange,
     onNetworkChange: onMetamaskNetworkChange,
   } = useWeb3(setWalletInfo);
@@ -62,6 +65,14 @@ const Home: NextPage = () => {
     } else {
       return;
     }
+  };
+
+  const handleSendTokenClick = () => {
+    if (currentWallet === "METAMASK" && walletAddress) {
+      sendMetamaskTokon(walletAddress, TO_ADDRESS, "0.00003");
+      return;
+    }
+    alert("fail");
   };
 
   const handleAccountChange = (address: string, wallet: TWALLET, network: TNETWORK) => {
@@ -101,8 +112,15 @@ const Home: NextPage = () => {
 
   return (
     <Wrapper>
-      {isMobileDevice ? <TEXT>Real Mobile</TEXT> : <TEXT>Real Desktop</TEXT>}
+      {isMobile ? (
+        <TEXT>
+          Real Mobile : {mobileOs} : {mobileBrowser}
+        </TEXT>
+      ) : (
+        <TEXT>Real Desktop</TEXT>
+      )}
       {isMobileSize ? <TEXT>Mobile</TEXT> : <TEXT>Desktop</TEXT>}
+      {}
       <h2 className="walletAddress">
         Wallet: <span>{currentWallet}</span>
       </h2>
@@ -114,6 +132,9 @@ const Home: NextPage = () => {
       </h2>
       <button className="btn" onClick={handleGetAddressClick}>
         Get Address
+      </button>
+      <button className="btn" onClick={handleSendTokenClick}>
+        Send token
       </button>
       <Btn_Container>
         <button className="btn" onClick={connectMetamask}>

@@ -1,5 +1,6 @@
 type TWALLET = "METAMASK" | "KAIKAS" | "PHANTOM" | "";
 type TNETWORK = "ETHEREUM" | "KLAYTN" | "SOLANA" | "";
+type TMobileOs = "ANDROID" | "IOS" | "";
 
 // Data
 interface ISong {
