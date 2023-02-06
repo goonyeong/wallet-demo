@@ -15,12 +15,6 @@ const web3Modal = new Web3Modal({
   standaloneChains: ["eip155:1"],
 });
 
-// web3Modal.setTheme({
-//   themeMode: "dark",
-//   themeColor: "blue",
-//   themeBackground: "gradient",
-// });
-
 export const UseWalletConnect = () => {
   const [signClient, setSignClient] = useState<SignClient | undefined>(undefined);
 
@@ -28,8 +22,6 @@ export const UseWalletConnect = () => {
   async function onInitializeSignClient() {
     const client = await SignClient.init({
       projectId: PROJECT_ID,
-      // relayUrl: "https://www.nile.io",
-      // relayUrl: "https://gleaming-sunshine-d5d85a.netlify.app",
     });
     setSignClient(client);
   }
@@ -37,6 +29,7 @@ export const UseWalletConnect = () => {
   // 4. Initiate connection and pass pairing uri to the modal
   async function onOpenModal() {
     console.log("sign Client", signClient);
+
     if (signClient) {
       const namespaces = {
         eip155: { methods: ["eth_sign"], chains: ["eip155:1"], events: ["accountsChanged"] },
@@ -45,19 +38,14 @@ export const UseWalletConnect = () => {
 
       console.log("uri", uri);
 
-      // signClient.on("session_event", ({ event }: any) => {
-      //   console.log("event", event);
-      //   // Handle session events, such as "chainChanged", "accountsChanged", etc.
-      // });
-
       if (uri) {
-        await web3Modal.openModal({
+        const openModalResult = await web3Modal.openModal({
           uri,
           standaloneChains: namespaces.eip155.chains,
         });
-        console.log("after open", web3Modal.openModal);
-        await approval();
-        console.log("afterapproval", approval);
+        console.log("after open", openModalResult);
+        const web3ApprovalObj = await approval();
+        console.log("afterapproval", web3ApprovalObj);
         web3Modal.closeModal();
       }
     }
@@ -66,6 +54,15 @@ export const UseWalletConnect = () => {
   useEffect(() => {
     onInitializeSignClient();
   }, []);
+
+  useEffect(() => {
+    if (!signClient) return;
+
+    signClient.on("session_event", ({ event }: any) => {
+      console.log("event", event);
+      // Handle session events, such as "chainChanged", "accountsChanged", etc.
+    });
+  }, [signClient]);
 
   return { onOpenModal };
 };
