@@ -45,16 +45,15 @@ export const UseWalletConnect = () => {
 
       console.log("uri", uri);
 
-      signClient.on("session_event", ({ event }: any) => {
-        console.log("event", event);
-        // Handle session events, such as "chainChanged", "accountsChanged", etc.
-      });
+      // signClient.on("session_event", ({ event }: any) => {
+      //   console.log("event", event);
+      //   // Handle session events, such as "chainChanged", "accountsChanged", etc.
+      // });
 
       if (uri) {
         await web3Modal.openModal({
           uri,
           standaloneChains: namespaces.eip155.chains,
-          route: "ConnectWallet",
         });
         console.log("after open", web3Modal.openModal);
         await approval();
