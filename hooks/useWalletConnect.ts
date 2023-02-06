@@ -11,7 +11,7 @@ if (!PROJECT_ID) {
 
 const web3Modal = new Web3Modal({
   projectId: PROJECT_ID,
-  walletConnectVersion: 1,
+  walletConnectVersion: 2,
   standaloneChains: ["eip155:1"],
 });
 
