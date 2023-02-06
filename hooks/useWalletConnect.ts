@@ -29,7 +29,7 @@ export const UseWalletConnect = () => {
     const client = await SignClient.init({
       projectId: PROJECT_ID,
       // relayUrl: "https://www.nile.io",
-      relayUrl: "https://gleaming-sunshine-d5d85a.netlify.app",
+      // relayUrl: "https://gleaming-sunshine-d5d85a.netlify.app",
     });
     setSignClient(client);
   }
