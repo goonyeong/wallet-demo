@@ -30,24 +30,30 @@ export const UseWalletConnect = () => {
   async function onOpenModal() {
     console.log("sign Client", signClient);
 
-    if (signClient) {
-      const namespaces = {
-        eip155: { methods: ["eth_sign"], chains: ["eip155:1"], events: ["accountsChanged"] },
-      };
-      const { uri, approval } = await signClient.connect({ requiredNamespaces: namespaces });
+    try {
+      if (signClient) {
+        const namespaces = {
+          eip155: { methods: ["eth_sign"], chains: ["eip155:1"], events: ["accountsChanged"] },
+        };
+        const { uri, approval } = await signClient.connect({ requiredNamespaces: namespaces });
 
-      console.log("uri", uri);
+        console.log("uri", uri);
 
-      if (uri) {
-        const openModalResult = await web3Modal.openModal({
-          uri,
-          standaloneChains: namespaces.eip155.chains,
-        });
-        console.log("after open", openModalResult);
-        const web3ApprovalObj = await approval();
-        console.log("afterapproval", web3ApprovalObj);
-        web3Modal.closeModal();
+        if (uri) {
+          await web3Modal.openModal({
+            uri,
+            standaloneChains: namespaces.eip155.chains,
+          });
+          console.log("after open");
+
+          const session = await approval();
+          console.log("afterapproval", session);
+
+          web3Modal.closeModal();
+        }
       }
+    } catch (e) {
+      console.log("error walletConnect", e);
     }
   }
 
