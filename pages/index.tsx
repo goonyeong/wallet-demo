@@ -9,6 +9,7 @@ import useWeb3 from "hooks/useWeb3";
 import useKlaytn from "hooks/useKlaytn";
 import useMobile from "hooks/useMobile";
 import useResponsive from "hooks/useResponsive";
+import { UseWalletConnect } from "hooks/useWalletConnect";
 
 const TO_ADDRESS = "0x364d05346E52934e01B8FB5d7E371E02b3ce70C6";
 
@@ -38,6 +39,7 @@ const Home: NextPage = () => {
     onAccountChange: onMetamaskAccountChange,
     onNetworkChange: onMetamaskNetworkChange,
   } = useWeb3(setWalletInfo);
+
   const {
     klaytnProvider,
     isWalletInstall: isKaikasInstall,
@@ -47,6 +49,7 @@ const Home: NextPage = () => {
     onNetworkChange: onKaikasNetworkChange,
     onDisconnect: onKaikasDisconnect,
   } = useKlaytn(setWalletInfo);
+
   const {
     solanaProvider,
     isWalletInstall: isPhantomInstall,
@@ -54,6 +57,8 @@ const Home: NextPage = () => {
     getAddress: getPhantomAddress,
     onAccountChange: onPhantomAccountChange,
   } = useSolana(setWalletInfo);
+
+  const { onOpenModal: connectWalletConnect } = UseWalletConnect(); // tmp
 
   const handleGetAddressClick = () => {
     if (currentWallet === "METAMASK") {
@@ -145,6 +150,9 @@ const Home: NextPage = () => {
         </button>
         <button className="btn" onClick={connectPhantom} disabled={!isPhantomInstall}>
           {isPhantomInstall ? "Phantom Connect" : "Phantom is not installed"}
+        </button>
+        <button className="btn" onClick={connectWalletConnect} disabled={!isPhantomInstall}>
+          {"Wallet Connect"}
         </button>
       </Btn_Container>
     </Wrapper>
